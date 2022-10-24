@@ -2,11 +2,11 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <stdio.h>
 
 using namespace std;
 
 void game(vector<string> &tree);
+void addElements(vector<string> &tree, int prev, int j);
 
 int main()
 {
@@ -21,26 +21,22 @@ int main()
         cout << "Сохранение загружено" << endl;
         cout << "_______________________________" << endl;
 
-        int i = 0;
-
         while (!file.eof())
         {
             string temp;
             getline(file, temp);
             tree.push_back(temp);
-            // cout << tree.at(i) << endl;
-            i += 1;
         }
         file.close();
 
-        char exit[5] = "2";
-        while (atoi(exit) != 1)
+        int k;
+        while (k != 1)
         {
             game(tree);
             cout << "Хотите повторить?" << endl;
             cout << "1 - нет" << endl;
             cout << "любая другая цифра - да" << endl;
-            cin >> exit;
+            cin >> k;
             cout << "_______________________________" << endl;
         }
 
@@ -68,8 +64,6 @@ int main()
 
 void game(vector<string> &tree)
 {
-    vector<string>::iterator it = tree.begin();
-
     int j = 1;
     int deep = 1;
 
@@ -91,67 +85,71 @@ void game(vector<string> &tree)
         if (answer == 1)
         {
             j *= 2;
-            try
-            {
-                if (tree.at(j) == "")
-                {
-                    tree.at(-1);
-                }
-            }
-            catch (std::out_of_range)
+            if (j >= tree.size())
             {
                 cout << "Ура, победа!" << endl;
                 cout << "_______________________________" << endl;
                 break;
             }
+            else
+            {
+                if (tree.at(j) == "")
+                {
+                    cout << "Ура, победа!" << endl;
+                    cout << "_______________________________" << endl;
+                    break;
+                }
+            }
         }
         else
         {
             j = j * 2 + 1;
-            try
-            {
-                if (tree.at(j) == "")
-                {
-                    tree.at(-1);
-                }
-            }
-            catch (std::out_of_range)
+            if (j >= tree.size())
             {
                 string question;
                 string animal;
 
-                cout << "К сожалению, я не знаю, что это за животное(" << endl;
-                cout << "Пожалуйста, введите вопрос при ответе 'да', на который, ответом будет ваше животное" << endl;
-
-                cin.ignore();
-                getline(cin, question);
-
-                cout << "Пожалуйста, ввдеите животное, которое загадали" << endl;
-
-                getline(cin, animal);
-
-                try
-                {
-                    tree.at(j);
-                }
-                catch (std::out_of_range)
+                if (j > tree.size())
                 {
                     for (int i = 0; i < deep * 2; ++i)
                     {
                         tree.push_back("");
                     }
                 }
-
-                string temp = tree.at(prev);
-                tree.at(prev) = question;
-                tree.at(j) = temp;
-                tree.at(j - 1) = "Это " + animal + "?";
-                cout << "_______________________________" << endl;
-
+                addElements(tree, prev, j);
                 break;
+            }
+            else
+            {
+                if (tree.at(j) == "")
+                {
+                    addElements(tree, prev, j);
+                    break;
+                }
             }
         }
         cout << "_______________________________" << endl;
         deep *= 2;
     }
+}
+
+void addElements(vector<string> &tree, int prev, int j)
+{
+    string question;
+    string animal;
+
+    cout << "К сожалению, я не знаю, что это за животное(" << endl;
+    cout << "Пожалуйста, введите вопрос при ответе 'да', на который, ответом будет ваше животное" << endl;
+
+    cin.ignore();
+    getline(cin, question);
+
+    cout << "Пожалуйста, ввдеите животное, которое загадали" << endl;
+
+    getline(cin, animal);   
+    string temp = tree.at(prev);
+    tree.at(prev) = question;
+    tree.at(j) = temp;
+    tree.at(j - 1) = "Это " + animal + "?";
+    cout << "_______________________________" << endl;
 }
